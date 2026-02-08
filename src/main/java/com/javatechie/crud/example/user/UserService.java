@@ -1,6 +1,5 @@
 package com.javatechie.crud.example.user;
 
-import com.javatechie.crud.example.user.*;
 import com.javatechie.crud.example.response.ErrorType.*;
 import com.javatechie.crud.example.response.Result;
 import lombok.RequiredArgsConstructor;
@@ -8,22 +7,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * User Service Layer
- * Handles all user-related business logic and validation
- * Returns Result<T> for type-safe error handling
- */
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
 
-    // ============ Validation Methods ============
-
-    /**
-     * Validate user ID is valid number
-     */
+    // Validation Methods
     private Result<Long> validateUserId(String idString) {
         try {
             Long userId = Long.parseLong(idString);
@@ -36,9 +25,7 @@ public class UserService {
         }
     }
 
-    /**
-     * Validate user exists
-     */
+
     private Result<User> validateUserExists(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -47,9 +34,7 @@ public class UserService {
         return new Result.Success<>(user);
     }
 
-    /**
-     * Validate authorization - user can only update their own profile
-     */
+
     private Result<Void> validateAuthorization(Long requestedUserId, Long currentUserId) {
         if (!requestedUserId.equals(currentUserId)) {
             return new Result.Error<>(new AccessDeniedError());
@@ -57,28 +42,19 @@ public class UserService {
         return new Result.Success<>(null);
     }
 
-    /**
-     * Validate update request fields
-     */
+
     private Result<Void> validateUpdateRequest(User updatedUser) {
         if (updatedUser == null) {
             return new Result.Error<>(new BadRequestError("User data is required"));
         }
-
         if (updatedUser.getId() == null || updatedUser.getId() <= 0) {
             return new Result.Error<>(new ValidationError("userId", "Valid user ID is required"));
         }
-
         return new Result.Success<>(null);
     }
 
-    // ============ User Operations ============
 
-    /**
-     * Get user profile by ID
-     * Returns: Success -> User data (without password)
-     *          Error   -> Not found or validation error
-     */
+    // User Operations
     public Result<User> getProfile(String idString) {
         // Validate ID format
         Result<Long> idValidation = validateUserId(idString);
@@ -86,7 +62,7 @@ public class UserService {
             return new Result.Error<>(idValidation.getErrorOrNull());
         }
 
-        Long userId = idValidation.getOrNull();
+        Long userId = idValidation.getValueOrNull();
 
         try {
             // Check if user exists
@@ -95,7 +71,7 @@ public class UserService {
                 return new Result.Error<>(userValidation.getErrorOrNull());
             }
 
-            User user = userValidation.getOrNull();
+            User user = userValidation.getValueOrNull();
             user.setPassword(null); // Hide password
             return new Result.Success<>(user);
 
@@ -104,11 +80,7 @@ public class UserService {
         }
     }
 
-    /**
-     * Update user profile with authorization check
-     * Returns: Success -> Updated user data
-     *          Error   -> Validation, authorization, or not found error
-     */
+
     public Result<User> updateProfile(User updatedUser, Long currentUserId) {
         // Validate request
         Result<Void> requestValidation = validateUpdateRequest(updatedUser);
@@ -131,7 +103,7 @@ public class UserService {
                 return new Result.Error<>(userValidation.getErrorOrNull());
             }
 
-            User existingUser = userValidation.getOrNull();
+            User existingUser = userValidation.getValueOrNull();
 
             // Update fields if provided
             if (updatedUser.getFirstName() != null && !updatedUser.getFirstName().trim().isEmpty()) {
@@ -162,11 +134,7 @@ public class UserService {
         }
     }
 
-    /**
-     * Get all users
-     * Returns: Success -> List of all users
-     *          Error   -> No users found or server error
-     */
+
     public Result<List<User>> getAllUsers() {
         try {
             List<User> users = userRepository.findAll();
@@ -184,11 +152,7 @@ public class UserService {
         }
     }
 
-    /**
-     * Delete user with authorization check
-     * Returns: Success -> Void
-     *          Error   -> Authorization, not found, or server error
-     */
+
     public Result<Void> deleteUser(Long userId, Long currentUserId) {
         // Validate authorization
         Result<Void> authValidation = validateAuthorization(userId, currentUserId);
@@ -212,11 +176,8 @@ public class UserService {
         }
     }
 
-    /**
-     * Search user by email
-     * Returns: Success -> User data
-     *          Error   -> Not found or server error
-     */
+
+
     public Result<User> getUserByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return new Result.Error<>(new FieldRequiredError("Email"));

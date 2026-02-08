@@ -2,8 +2,6 @@ package com.javatechie.crud.example.auth;
 import com.javatechie.crud.example.response.ApiResponse;
 import com.javatechie.crud.example.response.Result;
 import com.javatechie.crud.example.response.ErrorType;
-import com.javatechie.crud.example.auth.*;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Auth Controller - Clean controller layer
- * Only handles HTTP routing and delegates to service
- * All validation and business logic in AuthService
- */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -59,7 +52,7 @@ public class AuthController {
         Result<String> result = authService.refreshToken(userId, refreshToken);
         if (result.isSuccess()) {
             Map<String, String> data = new HashMap<>();
-            data.put("accessToken", result.getOrNull());
+            data.put("accessToken", result.getValueOrNull());
             return ResponseEntity.ok(ApiResponse.success(data, "Access token generated"));
         } else {
             return handleErrorResult(result.getErrorOrNull());
@@ -83,24 +76,19 @@ public class AuthController {
         }
     }
 
-    // ============ Helper Methods ============
-    private ResponseEntity<ApiResponse<AuthResponse>> handleAuthResult(
-            Result<AuthResponse> result,
-            String successMessage) {
+    //  Helper Methods
+    private ResponseEntity<ApiResponse<AuthResponse>> handleAuthResult(Result<AuthResponse> result, String successMessage) {
 
         if (result.isSuccess()) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success(result.getOrNull(), successMessage));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(result.getValueOrNull(), successMessage));
         } else {
             ErrorType error = result.getErrorOrNull();
-            return ResponseEntity.status(error.getHttpStatus())
-                    .body(ApiResponse.error(error.getMessage()));
+            return ResponseEntity.status(error.getHttpStatus()).body(ApiResponse.error(error.getMessage()));
         }
     }
 
     private <T> ResponseEntity<ApiResponse<T>> handleErrorResult(ErrorType error) {
-        return ResponseEntity.status(error.getHttpStatus())
-                .body(ApiResponse.error(error.getMessage()));
+        return ResponseEntity.status(error.getHttpStatus()).body(ApiResponse.error(error.getMessage()));
     }
 
     private String extractBearerToken(String header) {

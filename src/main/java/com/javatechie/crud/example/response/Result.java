@@ -16,6 +16,7 @@ public abstract class Result<T> {
         }
     }
 
+
     public static final class Error<T> extends Result<T> {
         public final ErrorType errorType;
 
@@ -29,6 +30,7 @@ public abstract class Result<T> {
         }
     }
 
+
     // Helper methods
     public boolean isSuccess() {
         return this instanceof Success;
@@ -38,11 +40,12 @@ public abstract class Result<T> {
         return this instanceof Error;
     }
 
-    public T getOrNull() {
+    public T getValueOrNull() {
         return this instanceof Success ? ((Success<T>) this).value : null;
     }
 
     public ErrorType getErrorOrNull() {
         return this instanceof Error ? ((Error<T>) this).errorType : null;
     }
+
 }

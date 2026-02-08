@@ -1,12 +1,6 @@
 package com.javatechie.crud.example.response;
-
 import org.springframework.http.HttpStatus;
 
-/**
- * ErrorType base class with static nested error classes
- * All error types in ONE FILE using static nested classes
- * This allows keeping everything in one file while following Java conventions
- */
 public abstract class ErrorType {
     private final HttpStatus httpStatus;
     private final String message;
@@ -29,8 +23,8 @@ public abstract class ErrorType {
         return this.getClass().getSimpleName() + "{" + message + "}";
     }
 
-    // ============ Input Validation Errors ============
 
+    // Input Validation Errors
     public static class ValidationError extends ErrorType {
         public ValidationError(String fieldName, String message) {
             super(HttpStatus.BAD_REQUEST, fieldName + ": " + message);
@@ -55,8 +49,8 @@ public abstract class ErrorType {
         }
     }
 
-    // ============ Authentication Errors ============
 
+    // Authentication Errors
     public static class InvalidCredentialsError extends ErrorType {
         public InvalidCredentialsError() {
             super(HttpStatus.UNAUTHORIZED, "Invalid email or password");
@@ -87,8 +81,8 @@ public abstract class ErrorType {
         }
     }
 
-    // ============ Resource Errors ============
 
+    // Resource Errors
     public static class ConflictError extends ErrorType {
         public ConflictError(String message) {
             super(HttpStatus.CONFLICT, message);
@@ -107,8 +101,8 @@ public abstract class ErrorType {
         }
     }
 
-    // ============ Authorization Errors ============
 
+    // Authorization Errors
     public static class ForbiddenError extends ErrorType {
         public ForbiddenError(String message) {
             super(HttpStatus.FORBIDDEN, message);
@@ -121,8 +115,8 @@ public abstract class ErrorType {
         }
     }
 
-    // ============ Server Errors ============
 
+    // Server Errors
     public static class InternalServerError extends ErrorType {
         public InternalServerError() {
             super(HttpStatus.INTERNAL_SERVER_ERROR, "An internal server error occurred");
@@ -139,8 +133,8 @@ public abstract class ErrorType {
         }
     }
 
-    // ============ Request Errors ============
 
+    //  Request Errors
     public static class BadRequestError extends ErrorType {
         public BadRequestError(String message) {
             super(HttpStatus.BAD_REQUEST, message);
@@ -152,4 +146,5 @@ public abstract class ErrorType {
             super(HttpStatus.BAD_REQUEST, "Missing required header: " + headerName);
         }
     }
+
 }

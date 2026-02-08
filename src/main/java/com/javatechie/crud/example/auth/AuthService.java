@@ -1,87 +1,72 @@
 package com.javatechie.crud.example.auth;
-
 import com.javatechie.crud.example.user.User;
 import com.javatechie.crud.example.user.UserRepository;
 import com.javatechie.crud.example.response.Result;
-import com.javatechie.crud.example.response.ErrorType;
+import com.javatechie.crud.example.response.ErrorType.*;
 import com.javatechie.crud.example.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
-/**
- * Authentication Service
- * Uses ErrorType static nested classes (all in one file)
- */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    // ============ Validation Methods ============
-
+    // Validation Methods
     private Result<Void> validateSignUpRequest(String firstName, String lastName, String email, String password) {
         if (firstName == null || firstName.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("First name"));
+            return new Result.Error<>(new FieldRequiredError("First name"));
         }
-
         if (lastName == null || lastName.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("Last name"));
+            return new Result.Error<>(new FieldRequiredError("Last name"));
         }
-
         if (email == null || email.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("Email"));
+            return new Result.Error<>(new FieldRequiredError("Email"));
         }
-
         if (!isValidEmail(email)) {
-            return new Result.Error<>(new ErrorType.InvalidEmailError());
+            return new Result.Error<>(new InvalidEmailError());
         }
-
         if (userRepository.findByEmail(email).isPresent()) {
-            return new Result.Error<>(new ErrorType.DuplicateEmailError());
+            return new Result.Error<>(new DuplicateEmailError());
         }
-
         if (password == null || password.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("Password"));
+            return new Result.Error<>(new FieldRequiredError("Password"));
         }
-
         if (password.length() < 6) {
-            return new Result.Error<>(new ErrorType.InvalidPasswordError("Password must be at least 6 characters"));
+            return new Result.Error<>(new InvalidPasswordError("Password must be at least 6 characters"));
         }
-
         return new Result.Success<>(null);
     }
+
 
     private Result<Void> validateSignInRequest(String email, String password) {
         if (email == null || email.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("Email"));
+            return new Result.Error<>(new FieldRequiredError("Email"));
         }
-
         if (password == null || password.trim().isEmpty()) {
-            return new Result.Error<>(new ErrorType.FieldRequiredError("Password"));
+            return new Result.Error<>(new FieldRequiredError("Password"));
         }
-
         return new Result.Success<>(null);
     }
+
 
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-z0-9+_.-]+@[a-z0-9.-]+$";
         return email.matches(emailRegex);
     }
 
-    // ============ Authentication Methods ============
 
+    // Authentication Methods
     public Result<AuthResponse> signUp(String firstName, String lastName, String email, String password) {
-        Result<Void> validationResult = validateSignUpRequest(firstName, lastName, email, password);
-        if (validationResult.isError()) {
-            return new Result.Error<>(validationResult.getErrorOrNull());
-        }
-
         try {
+            Result<Void> validationResult = validateSignUpRequest(firstName, lastName, email, password);
+            if (validationResult.isError()) {
+                return new Result.Error<>(validationResult.getErrorOrNull());
+            }
             User user = new User();
             user.setFirstName(firstName);
             user.setLastName(lastName);
@@ -104,21 +89,21 @@ public class AuthService {
             return new Result.Success<>(authResponse);
 
         } catch (Exception e) {
-            return new Result.Error<>(new ErrorType.InternalServerError(e.getMessage()));
+            return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
 
-    public Result<AuthResponse> signIn(String email, String password) {
-        Result<Void> validationResult = validateSignInRequest(email, password);
-        if (validationResult.isError()) {
-            return new Result.Error<>(validationResult.getErrorOrNull());
-        }
 
+    public Result<AuthResponse> signIn(String email, String password) {
         try {
+            Result<Void> validationResult = validateSignInRequest(email, password);
+            if (validationResult.isError()) {
+                return new Result.Error<>(validationResult.getErrorOrNull());
+            }
             User user = userRepository.findByEmail(email).orElse(null);
 
             if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-                return new Result.Error<>(new ErrorType.InvalidCredentialsError());
+                return new Result.Error<>(new InvalidCredentialsError());
             }
 
             String accessToken = jwtUtil.generateAccessToken(user.getId());
@@ -133,48 +118,48 @@ public class AuthService {
             return new Result.Success<>(authResponse);
 
         } catch (Exception e) {
-            return new Result.Error<>(new ErrorType.InternalServerError(e.getMessage()));
+            return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
+
 
     public Result<String> refreshToken(Long userId, String refreshToken) {
         try {
             if (refreshToken == null || refreshToken.isEmpty()) {
-                return new Result.Error<>(new ErrorType.MissingHeaderError("Refresh Token"));
+                return new Result.Error<>(new MissingHeaderError("Refresh Token"));
             }
-
             if (jwtUtil.isTokenExpired(refreshToken)) {
-                return new Result.Error<>(new ErrorType.TokenExpiredError());
+                return new Result.Error<>(new TokenExpiredError());
             }
 
             Long tokenUserId;
             try {
                 tokenUserId = jwtUtil.extractUserId(refreshToken);
             } catch (Exception e) {
-                return new Result.Error<>(new ErrorType.InvalidTokenError());
+                return new Result.Error<>(new InvalidTokenError());
             }
 
             if (!tokenUserId.equals(userId)) {
-                return new Result.Error<>(new ErrorType.ForbiddenError("Token does not belong to provided user"));
+                return new Result.Error<>(new ForbiddenError("Token does not belong to provided user"));
             }
 
             User user = userRepository.findById(userId).orElse(null);
             if (user == null || user.getRefreshToken() == null || !refreshToken.equals(user.getRefreshToken())) {
-                return new Result.Error<>(new ErrorType.RefreshTokenMismatchError());
+                return new Result.Error<>(new RefreshTokenMismatchError());
             }
 
             String newAccessToken = jwtUtil.generateAccessToken(userId);
             return new Result.Success<>(newAccessToken);
-
         } catch (Exception e) {
-            return new Result.Error<>(new ErrorType.InternalServerError(e.getMessage()));
+            return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
+
 
     public Result<Void> logout(Long userId, Long currentUserId) {
         try {
             if (!userId.equals(currentUserId)) {
-                return new Result.Error<>(new ErrorType.AccessDeniedError());
+                return new Result.Error<>(new AccessDeniedError());
             }
 
             User user = userRepository.findById(userId).orElse(null);
@@ -184,9 +169,8 @@ public class AuthService {
             }
 
             return new Result.Success<>(null);
-
         } catch (Exception e) {
-            return new Result.Error<>(new ErrorType.InternalServerError(e.getMessage()));
+            return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
 }
