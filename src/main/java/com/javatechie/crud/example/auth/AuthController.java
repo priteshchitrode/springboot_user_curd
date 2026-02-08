@@ -1,0 +1,112 @@
+package com.javatechie.crud.example.auth;
+import com.javatechie.crud.example.response.ApiResponse;
+import com.javatechie.crud.example.response.Result;
+import com.javatechie.crud.example.response.ErrorType;
+import com.javatechie.crud.example.auth.*;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Auth Controller - Clean controller layer
+ * Only handles HTTP routing and delegates to service
+ * All validation and business logic in AuthService
+ */
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<ApiResponse<AuthResponse>> signUp(@RequestBody Map<String, String> request) {
+        String firstName = request.get("firstName");
+        String lastName = request.get("lastName");
+        String email = request.get("email");
+        String password = request.get("password");
+        Result<AuthResponse> result = authService.signUp(firstName, lastName, email, password);
+        return handleAuthResult(result, "User registered successfully");
+    }
+
+
+    @PostMapping("/signin")
+    public ResponseEntity<ApiResponse<AuthResponse>> signIn(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+        Result<AuthResponse> result = authService.signIn(email, password);
+        return handleAuthResult(result, "Login successful");
+    }
+
+
+    @PostMapping("/refresh_token/{userId}")
+    public ResponseEntity<ApiResponse<Map<String, String>>> refreshToken(@PathVariable Long userId, HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+
+        // Extract token from Bearer header
+        String refreshToken = extractBearerToken(header);
+        if (refreshToken == null) {
+            ErrorType error = new ErrorType.MissingHeaderError("Authorization Bearer Token");
+            return handleErrorResult(error);
+        }
+
+        Result<String> result = authService.refreshToken(userId, refreshToken);
+        if (result.isSuccess()) {
+            Map<String, String> data = new HashMap<>();
+            data.put("accessToken", result.getOrNull());
+            return ResponseEntity.ok(ApiResponse.success(data, "Access token generated"));
+        } else {
+            return handleErrorResult(result.getErrorOrNull());
+        }
+    }
+
+
+    @PostMapping("/logout/{userId}")
+    public ResponseEntity<ApiResponse<Void>> logout(@PathVariable Long userId) {
+        Long currentUserId = (Long) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        Result<Void> result = authService.logout(userId, currentUserId);
+
+        if (result.isSuccess()) {
+            return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
+        } else {
+            return handleErrorResult(result.getErrorOrNull());
+        }
+    }
+
+    // ============ Helper Methods ============
+    private ResponseEntity<ApiResponse<AuthResponse>> handleAuthResult(
+            Result<AuthResponse> result,
+            String successMessage) {
+
+        if (result.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(result.getOrNull(), successMessage));
+        } else {
+            ErrorType error = result.getErrorOrNull();
+            return ResponseEntity.status(error.getHttpStatus())
+                    .body(ApiResponse.error(error.getMessage()));
+        }
+    }
+
+    private <T> ResponseEntity<ApiResponse<T>> handleErrorResult(ErrorType error) {
+        return ResponseEntity.status(error.getHttpStatus())
+                .body(ApiResponse.error(error.getMessage()));
+    }
+
+    private String extractBearerToken(String header) {
+        if (header == null || !header.startsWith("Bearer ")) {
+            return null;
+        }
+        return header.substring(7).trim();
+    }
+}
