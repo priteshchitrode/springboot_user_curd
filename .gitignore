@@ -1,4 +1,3 @@
-src/
 pom.xml
 mvnw
 mvnw.cmd
@@ -7,3 +6,4 @@ README.md
 LICENSE
 .gitignore
 .idea
+/src/test
