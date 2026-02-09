@@ -8,7 +8,7 @@
 		<version>2.2.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.javatechie</groupId>
+	<groupId>com.priteshchitrode</groupId>
 	<artifactId>springboot-user-curd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-boot-crud-example-2</name>
