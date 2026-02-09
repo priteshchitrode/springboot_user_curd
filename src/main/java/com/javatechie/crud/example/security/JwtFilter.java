@@ -23,23 +23,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-
         String requestUri = request.getRequestURI();
-
         if (publicEndpoints.isPublic(requestUri)) {
             chain.doFilter(request, response);
             return;
         }
 
         String header = request.getHeader("Authorization");
-
         if (header == null || !header.startsWith("Bearer ")) {
             sendError(response, "Missing token");
             return;
         }
 
         String token = header.substring(7);
-
         if (jwtUtil.isTokenExpired(token)) {
             sendError(response, "Token expired or invalid");
             return;
@@ -60,13 +56,10 @@ public class JwtFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 
-            authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         chain.doFilter(request, response);
     }
 

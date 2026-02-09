@@ -1,5 +1,4 @@
 package com.javatechie.crud.example.user;
-
 import com.javatechie.crud.example.response.ErrorType.*;
 import com.javatechie.crud.example.response.Result;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +80,9 @@ public class UserService {
     }
 
 
-    public Result<User> updateProfile(User updatedUser, Long currentUserId) {
+    // Update Profile
+    public Result<User> updateProfile(User updatedUser) {
+
         // Validate request
         Result<Void> requestValidation = validateUpdateRequest(updatedUser);
         if (requestValidation.isError()) {
@@ -89,12 +90,6 @@ public class UserService {
         }
 
         Long userId = updatedUser.getId();
-
-        // Validate authorization
-        Result<Void> authValidation = validateAuthorization(userId, currentUserId);
-        if (authValidation.isError()) {
-            return new Result.Error<>(authValidation.getErrorOrNull());
-        }
 
         try {
             // Check if user exists
@@ -122,11 +117,16 @@ public class UserService {
                 existingUser.setAddress(updatedUser.getAddress());
             }
 
+            if (updatedUser.getEmail() != null && !updatedUser.getEmail().trim().isEmpty()) {
+                existingUser.setEmail(updatedUser.getEmail());
+            }
+
             existingUser.setUpdatedAt(LocalDateTime.now());
 
-            // Save and return
+            // Save
             User savedUser = userRepository.save(existingUser);
-            savedUser.setPassword(null); // Hide password
+            savedUser.setPassword(null); // hide password
+
             return new Result.Success<>(savedUser);
 
         } catch (Exception e) {
@@ -135,10 +135,10 @@ public class UserService {
     }
 
 
+    // Get All Users
     public Result<List<User>> getAllUsers() {
         try {
             List<User> users = userRepository.findAll();
-
             if (users.isEmpty()) {
                 return new Result.Error<>(new ResourceNotFoundError("Users"));
             }
@@ -146,20 +146,14 @@ public class UserService {
             // Hide passwords from all users
             users.forEach(user -> user.setPassword(null));
             return new Result.Success<>(users);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
 
 
-    public Result<Void> deleteUser(Long userId, Long currentUserId) {
-        // Validate authorization
-        Result<Void> authValidation = validateAuthorization(userId, currentUserId);
-        if (authValidation.isError()) {
-            return new Result.Error<>(authValidation.getErrorOrNull());
-        }
-
+    // Delete User
+    public Result<Void> deleteUser(Long userId) {
         try {
             // Check if user exists
             Result<User> userValidation = validateUserExists(userId);
@@ -170,7 +164,6 @@ public class UserService {
             // Delete user
             userRepository.deleteById(userId);
             return new Result.Success<>(null);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
@@ -178,20 +171,18 @@ public class UserService {
 
 
 
-    public Result<User> getUserByEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return new Result.Error<>(new FieldRequiredError("Email"));
-        }
 
+    public Result<User> getUserByEmail(String email) {
         try {
+            if (email == null || email.trim().isEmpty()) {
+                return new Result.Error<>(new FieldRequiredError("Email"));
+            }
             User user = userRepository.findByEmail(email).orElse(null);
             if (user == null) {
                 return new Result.Error<>(new ResourceNotFoundError("User with email: " + email));
             }
-
             user.setPassword(null); // Hide password
             return new Result.Success<>(user);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }

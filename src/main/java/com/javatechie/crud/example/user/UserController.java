@@ -3,9 +3,7 @@ import com.javatechie.crud.example.response.ApiResponse;
 import com.javatechie.crud.example.response.ErrorType;
 import com.javatechie.crud.example.response.Result;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -28,20 +26,9 @@ public class UserController {
     }
 
 
-    @PostMapping("/updateProfile")
+    @PostMapping("/update-profile")
     public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody User updatedUser) {
-        // Get current user ID from JWT token
-        Long currentUserId = (Long) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (currentUserId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized: Invalid or expired token"));
-        }
-
-        Result<User> result = userService.updateProfile(updatedUser, currentUserId);
-
+        Result<User> result = userService.updateProfile(updatedUser);
         if (result.isSuccess()) {
             return ResponseEntity.ok(ApiResponse.success(result.getValueOrNull(), "Profile updated successfully"));
         } else {
@@ -50,7 +37,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/getAllUsers")
+    @GetMapping("/get-all-users")
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         Result<List<User>> result = userService.getAllUsers();
         if (result.isSuccess()) {
@@ -61,19 +48,9 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("delete-user/{userId}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long userId) {
-        // Get current user ID from JWT token
-        Long currentUserId = (Long) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (currentUserId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized: Invalid or expired token"));
-        }
-
-        Result<Void> result = userService.deleteUser(userId, currentUserId);
+        Result<Void> result = userService.deleteUser(userId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(ApiResponse.success(null, "User deleted successfully"));
         } else {

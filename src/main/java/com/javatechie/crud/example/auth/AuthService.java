@@ -87,7 +87,6 @@ public class AuthService {
             AuthResponse authResponse = new AuthResponse(savedUser, accessToken, refreshToken);
 
             return new Result.Success<>(authResponse);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
@@ -156,21 +155,23 @@ public class AuthService {
     }
 
 
-    public Result<Void> logout(Long userId, Long currentUserId) {
+    public Result<Void> logout(Long userId) {
         try {
-            if (!userId.equals(currentUserId)) {
-                return new Result.Error<>(new AccessDeniedError());
-            }
-
             User user = userRepository.findById(userId).orElse(null);
-            if (user != null) {
-                user.setRefreshToken(null);
-                userRepository.save(user);
+            if (user == null) {
+                return new Result.Error<>(new NotFoundError("User not found"));
             }
 
+            if (user.getRefreshToken() == null) {
+                return new Result.Error<>(new BadRequestError("User already logged out"));
+            }
+            user.setRefreshToken(null);
+            userRepository.save(user);
             return new Result.Success<>(null);
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
+
+
 }

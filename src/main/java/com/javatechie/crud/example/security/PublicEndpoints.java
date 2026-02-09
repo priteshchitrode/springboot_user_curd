@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 public class PublicEndpoints {
 
     private static final String[] PUBLIC_URLS = {
-            "/api/auth/signup",
-            "/api/auth/signin",
-            "/api/auth/refresh_token"
+            "/api/auth/sign-up",
+            "/api/auth/sign-in",
+            "/api/auth/refresh-token"
     };
 
     public boolean isPublic(String requestUri) {

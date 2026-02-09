@@ -75,6 +75,7 @@ public abstract class ErrorType {
         }
     }
 
+
     public static class RefreshTokenMismatchError extends ErrorType {
         public RefreshTokenMismatchError() {
             super(HttpStatus.UNAUTHORIZED, "Refresh token does not match");
@@ -86,6 +87,13 @@ public abstract class ErrorType {
     public static class ConflictError extends ErrorType {
         public ConflictError(String message) {
             super(HttpStatus.CONFLICT, message);
+        }
+    }
+
+
+    public static class NotFoundError extends ErrorType {
+        public NotFoundError(String resource) {
+            super(HttpStatus.NOT_FOUND,  resource);
         }
     }
 
@@ -118,10 +126,6 @@ public abstract class ErrorType {
 
     // Server Errors
     public static class InternalServerError extends ErrorType {
-        public InternalServerError() {
-            super(HttpStatus.INTERNAL_SERVER_ERROR, "An internal server error occurred");
-        }
-
         public InternalServerError(String message) {
             super(HttpStatus.INTERNAL_SERVER_ERROR, message);
         }
