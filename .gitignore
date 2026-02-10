@@ -1,9 +1,14 @@
-pom.xml
-mvnw
-mvnw.cmd
-README.md
-LICENSE
-.gitignore
-.idea
-/src/test
-/.mvntarget/
+# Maven
+/target/
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
+# Logs
+*.log
