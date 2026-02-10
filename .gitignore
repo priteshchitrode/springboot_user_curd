@@ -6,4 +6,4 @@ LICENSE
 .gitignore
 .idea
 /src/test
-/.mvn
+/.mvntarget/
