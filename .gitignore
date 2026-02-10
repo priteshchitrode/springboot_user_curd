@@ -1,9 +1,9 @@
 pom.xml
 mvnw
 mvnw.cmd
-.mvn
 README.md
 LICENSE
 .gitignore
 .idea
 /src/test
+/.mvn
