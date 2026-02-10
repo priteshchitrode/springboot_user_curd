@@ -1,7 +1,7 @@
 pom.xml
 mvnw
 mvnw.cmd
-.mvn/wrapper
+.mvn
 README.md
 LICENSE
 .gitignore

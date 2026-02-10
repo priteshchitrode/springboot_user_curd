@@ -115,7 +115,6 @@ public class AuthService {
             AuthResponse authResponse = new AuthResponse(user, accessToken, refreshToken);
 
             return new Result.Success<>(authResponse);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }

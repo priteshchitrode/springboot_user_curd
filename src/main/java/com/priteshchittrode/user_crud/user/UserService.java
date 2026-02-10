@@ -55,15 +55,15 @@ public class UserService {
 
     // User Operations
     public Result<User> getProfile(String idString) {
-        // Validate ID format
-        Result<Long> idValidation = validateUserId(idString);
-        if (idValidation.isError()) {
-            return new Result.Error<>(idValidation.getErrorOrNull());
-        }
-
-        Long userId = idValidation.getValueOrNull();
-
         try {
+            // Validate ID format
+            Result<Long> idValidation = validateUserId(idString);
+            if (idValidation.isError()) {
+                return new Result.Error<>(idValidation.getErrorOrNull());
+            }
+
+            Long userId = idValidation.getValueOrNull();
+
             // Check if user exists
             Result<User> userValidation = validateUserExists(userId);
             if (userValidation.isError()) {
@@ -73,7 +73,6 @@ public class UserService {
             User user = userValidation.getValueOrNull();
             user.setPassword(null); // Hide password
             return new Result.Success<>(user);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
@@ -82,16 +81,15 @@ public class UserService {
 
     // Update Profile
     public Result<User> updateProfile(User updatedUser) {
-
-        // Validate request
-        Result<Void> requestValidation = validateUpdateRequest(updatedUser);
-        if (requestValidation.isError()) {
-            return new Result.Error<>(requestValidation.getErrorOrNull());
-        }
-
-        Long userId = updatedUser.getId();
-
         try {
+            // Validate request
+            Result<Void> requestValidation = validateUpdateRequest(updatedUser);
+            if (requestValidation.isError()) {
+                return new Result.Error<>(requestValidation.getErrorOrNull());
+            }
+
+            Long userId = updatedUser.getId();
+
             // Check if user exists
             Result<User> userValidation = validateUserExists(userId);
             if (userValidation.isError()) {
@@ -104,23 +102,18 @@ public class UserService {
             if (updatedUser.getFirstName() != null && !updatedUser.getFirstName().trim().isEmpty()) {
                 existingUser.setFirstName(updatedUser.getFirstName());
             }
-
             if (updatedUser.getLastName() != null && !updatedUser.getLastName().trim().isEmpty()) {
                 existingUser.setLastName(updatedUser.getLastName());
             }
-
             if (updatedUser.getPhoneNumber() != null && !updatedUser.getPhoneNumber().trim().isEmpty()) {
                 existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
             }
-
             if (updatedUser.getAddress() != null && !updatedUser.getAddress().trim().isEmpty()) {
                 existingUser.setAddress(updatedUser.getAddress());
             }
-
             if (updatedUser.getEmail() != null && !updatedUser.getEmail().trim().isEmpty()) {
                 existingUser.setEmail(updatedUser.getEmail());
             }
-
             existingUser.setUpdatedAt(LocalDateTime.now());
 
             // Save
@@ -128,7 +121,6 @@ public class UserService {
             savedUser.setPassword(null); // hide password
 
             return new Result.Success<>(savedUser);
-
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
@@ -170,8 +162,7 @@ public class UserService {
     }
 
 
-
-
+    // Get User by Email
     public Result<User> getUserByEmail(String email) {
         try {
             if (email == null || email.trim().isEmpty()) {
@@ -187,4 +178,6 @@ public class UserService {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
+
+
 }
