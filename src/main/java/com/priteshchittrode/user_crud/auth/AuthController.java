@@ -75,15 +75,13 @@ public class AuthController {
                     .body(ApiResponse.success(result.getValueOrNull(), successMessage));
         } else {
             ErrorType error = result.getErrorOrNull();
-            return ResponseEntity.status(error.getHttpStatus())
-                    .body(ApiResponse.error(error.getMessage()));
+            return ResponseEntity.status(error.getHttpStatus()).body(ApiResponse.error(error.getMessage()));
         }
     }
 
 
     private <T> ResponseEntity<ApiResponse<T>> handleErrorResult(ErrorType error) {
-        return ResponseEntity.status(error.getHttpStatus())
-                .body(ApiResponse.error(error.getMessage()));
+        return ResponseEntity.status(error.getHttpStatus()).body(ApiResponse.error(error.getMessage()));
     }
 
 

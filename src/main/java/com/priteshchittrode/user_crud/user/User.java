@@ -40,6 +40,12 @@ public class User {
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private boolean phoneVerified = false;
+
     @Column(columnDefinition = "TEXT")
     private String address;
 
