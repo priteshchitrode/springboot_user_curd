@@ -19,7 +19,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailVerificationService {
     private final JavaMailSender mailSender;
     private final EmailVerificationRepository emailVerificationRepository;
     private final UserRepository userRepository;

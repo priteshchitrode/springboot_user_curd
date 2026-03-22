@@ -10,8 +10,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
-public class EmailController {
-    private final EmailService emailService;
+public class EmailVerificationController {
+    private final EmailVerificationService emailService;
 
     @PostMapping("/send-otp")
     public ResponseEntity<ApiResponse<String>> sendOtp(@RequestBody Map<String, String> request) {
