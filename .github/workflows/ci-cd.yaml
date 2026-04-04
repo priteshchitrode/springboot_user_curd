@@ -27,6 +27,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: 'springboot-user-curd-app'
           environment_name: 'springboot-user-curd-app-env'
-          version_label: ${{ github.sha }}-${{ github.run_number }}  # ← unique every run
+          version_label: "${{ github.sha }}-${{ github.run_number }}-${{ github.run_attempt }}"
           deployment_package: target/*.jar
           use_existing_version_if_available: true   # ← fallback safety
