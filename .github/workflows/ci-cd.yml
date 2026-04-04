@@ -3,7 +3,7 @@ name: Deploy to Elastic Beanstalk
 on:
   push:
     branches:
-      - deploy-to-elastic-beanstalk
+      - deploy/deploy-on-aws-elastic-beanstalk
 
 
 
