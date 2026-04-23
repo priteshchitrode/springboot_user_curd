@@ -16,9 +16,9 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
 
+    // Sign Up Api
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResponse<AuthResponse>> signUp(@RequestBody Map<String, String> request) {
         String firstName = request.get("firstName");
@@ -30,6 +30,7 @@ public class AuthController {
         return handleAuthResult(result, "User registered successfully");
     }
 
+    // Sign In Api
     @PostMapping("/sign-in")
     public ResponseEntity<ApiResponse<AuthResponse>> signIn(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -39,6 +40,7 @@ public class AuthController {
         return handleAuthResult(result, "Login successful");
     }
 
+    // Refresh Token Api
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<Map<String, String>>> refreshToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
@@ -60,6 +62,7 @@ public class AuthController {
         }
     }
 
+    // Logout Api
     @PostMapping("/logout/{userId}")
     public ResponseEntity<ApiResponse<Void>> logout(@PathVariable Long userId) {
         Result<Void> result = authService.logout(userId);
@@ -71,6 +74,7 @@ public class AuthController {
         }
     }
 
+    // Handle Auth Response
     private ResponseEntity<ApiResponse<AuthResponse>> handleAuthResult(Result<AuthResponse> result, String successMessage) {
         if (result.isSuccess()) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -82,6 +86,7 @@ public class AuthController {
         }
     }
 
+    // Handle Auth Error
     private <T> ResponseEntity<ApiResponse<T>> handleErrorResult(ErrorType error) {
         return ResponseEntity.status(error.getHttpStatus())
                 .body(ApiResponse.error(error.getMessage()));
@@ -93,4 +98,5 @@ public class AuthController {
         }
         return header.substring(7).trim();
     }
+
 }

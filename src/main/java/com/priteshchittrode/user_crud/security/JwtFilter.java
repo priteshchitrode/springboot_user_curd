@@ -24,9 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private PublicEndpoints publicEndpoints;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
 
@@ -53,12 +51,9 @@ public class JwtFilter extends OncePerRequestFilter {
             request.setAttribute("userId", userId);
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
@@ -70,9 +65,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
+
     private void sendError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.getWriter().write("{\"status\":\"Failed\",\"message\":\"" + message + "\"}");
     }
+
 }

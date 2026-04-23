@@ -29,7 +29,7 @@ public class EmailVerificationService {
 
     private static final SecureRandom random = new SecureRandom();
 
-    ///  Send Otp
+    /// Send Otp Service
     public Result<String> sendOtpOnEmail(Map<String, String> request) {
         try {
             String userIdStr = request.get("userId");
@@ -90,7 +90,7 @@ public class EmailVerificationService {
     }
 
 
-    ///  Verify Email Otp
+    ///  Verify Email Otp Service
     public Result<Void> verifyEmailOtp(Map<String, String> request) {
         try {
 
@@ -164,7 +164,7 @@ public class EmailVerificationService {
     }
 
 
-    ///  Resend Otp
+    ///  Resend Otp Service
     public Result<String> resendOtpOnEmail(Map<String, String> request) {
         try {
             String userIdStr = request.get("userId");
@@ -230,6 +230,7 @@ public class EmailVerificationService {
     }
 
 
+    /// send Email Service
     private void sendEmail(String to, String subject, String body) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -244,6 +245,8 @@ public class EmailVerificationService {
         }
     }
 
+
+    /// Email UI
     private String buildVerificationEmailBody(String firstName, String otp) {
         return "<!DOCTYPE html>" +
                 "<html lang='en'><head><meta charset='UTF-8'>" +

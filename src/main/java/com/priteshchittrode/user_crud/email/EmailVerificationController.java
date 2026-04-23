@@ -13,6 +13,7 @@ import java.util.Map;
 public class EmailVerificationController {
     private final EmailVerificationService emailService;
 
+    // Sent Otp Api
     @PostMapping("/send-otp")
     public ResponseEntity<ApiResponse<String>> sendOtp(@RequestBody Map<String, String> request) {
         Result<String> result = emailService.sendOtpOnEmail(request);
@@ -24,6 +25,7 @@ public class EmailVerificationController {
         }
     }
 
+    // Verify Otp Api
     @PostMapping("/verify-otp")
     public ResponseEntity<ApiResponse<Void>> verifyOtp(@RequestBody Map<String, String> request) {
         Result<Void> result = emailService.verifyEmailOtp(request);
@@ -36,6 +38,7 @@ public class EmailVerificationController {
     }
 
 
+    // Resent Otp Api
     @PostMapping("/resend-otp")
     public ResponseEntity<ApiResponse<String>> resendOtp(@RequestBody Map<String, String> request) {
         Result<String> result = emailService.resendOtpOnEmail(request);

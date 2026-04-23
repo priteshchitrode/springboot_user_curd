@@ -5,20 +5,19 @@ import com.priteshchittrode.user_crud.response.ErrorType.*;
 import com.priteshchittrode.user_crud.security.JwtUtil;
 import com.priteshchittrode.user_crud.user.User;
 import com.priteshchittrode.user_crud.user.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    /// Validation for sign up
     private Result<Void> validateSignUpRequest(String firstName, String lastName, String email, String password) {
         if (firstName == null || firstName.trim().isEmpty()) {
             return new Result.Error<>(new FieldRequiredError("First name"));
@@ -44,6 +43,8 @@ public class AuthService {
         return new Result.Success<>(null);
     }
 
+
+    /// Validation for sign in
     private Result<Void> validateSignInRequest(String email, String password) {
         if (email == null || email.trim().isEmpty()) {
             return new Result.Error<>(new FieldRequiredError("Email"));
@@ -54,11 +55,14 @@ public class AuthService {
         return new Result.Success<>(null);
     }
 
+
+    /// Check Email is correct or not
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
         return email.matches(emailRegex);
     }
 
+    /// Signup Service
     public Result<AuthResponse> signUp(String firstName, String lastName, String email, String password) {
         try {
             Result<Void> validationResult = validateSignUpRequest(firstName, lastName, email, password);
@@ -91,6 +95,8 @@ public class AuthService {
         }
     }
 
+
+    /// Sign-In Service
     public Result<AuthResponse> signIn(String email, String password) {
         try {
             Result<Void> validationResult = validateSignInRequest(email, password);
@@ -120,6 +126,8 @@ public class AuthService {
         }
     }
 
+
+    /// Refresh Token Service
     public Result<String> refreshToken(String refreshToken) {
         try {
             if (refreshToken == null || refreshToken.isEmpty()) {
@@ -149,6 +157,8 @@ public class AuthService {
         }
     }
 
+
+    /// Logout Service
     public Result<Void> logout(Long userId) {
         try {
             User user = userRepository.findById(userId).orElse(null);
@@ -169,4 +179,6 @@ public class AuthService {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
+
+
 }

@@ -1,7 +1,5 @@
 package com.priteshchittrode.user_crud.security;
-
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
@@ -13,8 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "javatechie_secret_javatechie_secret_123456";
-    private static final SecretKey KEY =
-            Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
     private static final long ACCESS_EXPIRATION = 1000L * 60 * 60 * 24 * 2; // 2 days
     private static final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 7 days
@@ -68,8 +65,7 @@ public class JwtUtil {
     public boolean isValidAccessToken(String token) {
         try {
             Claims claims = extractAllClaims(token);
-            return ACCESS.equals(claims.get(CLAIM_TOKEN_TYPE, String.class))
-                    && !claims.getExpiration().before(new Date());
+            return ACCESS.equals(claims.get(CLAIM_TOKEN_TYPE, String.class)) && !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
