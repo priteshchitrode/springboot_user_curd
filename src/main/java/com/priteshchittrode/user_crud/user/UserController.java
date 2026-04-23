@@ -14,7 +14,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-
+    // Get Profile By Id Api
     @GetMapping("/profile/{id}")
     public ResponseEntity<ApiResponse<User>> getProfile(@PathVariable String id) {
         Result<User> result = userService.getProfile(id);
@@ -26,6 +26,7 @@ public class UserController {
     }
 
 
+    // Update Profile Api
     @PostMapping("/update-profile")
     public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody User updatedUser) {
         Result<User> result = userService.updateProfile(updatedUser);
@@ -37,6 +38,7 @@ public class UserController {
     }
 
 
+    // Get All User Api
     @GetMapping("/get-all-users")
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         Result<List<User>> result = userService.getAllUsers();
@@ -48,6 +50,7 @@ public class UserController {
     }
 
 
+    // Delete User Api
     @DeleteMapping("delete-user/{userId}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long userId) {
         Result<Void> result = userService.deleteUser(userId);
@@ -59,6 +62,7 @@ public class UserController {
     }
 
 
+    // Get User By Email Api
     @GetMapping("/email/{email}")
     public ResponseEntity<ApiResponse<User>> getUserByEmail(@PathVariable String email) {
         Result<User> result = userService.getUserByEmail(email);

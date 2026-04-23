@@ -1,12 +1,13 @@
 package com.priteshchittrode.user_crud.auth;
-import com.priteshchittrode.user_crud.user.User;
-import com.priteshchittrode.user_crud.user.UserRepository;
+
 import com.priteshchittrode.user_crud.response.Result;
 import com.priteshchittrode.user_crud.response.ErrorType.*;
 import com.priteshchittrode.user_crud.security.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import com.priteshchittrode.user_crud.user.User;
+import com.priteshchittrode.user_crud.user.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 
 @Service
@@ -16,7 +17,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    // Validation Methods
+    /// Validation for sign up
     private Result<Void> validateSignUpRequest(String firstName, String lastName, String email, String password) {
         if (firstName == null || firstName.trim().isEmpty()) {
             return new Result.Error<>(new FieldRequiredError("First name"));
@@ -43,6 +44,7 @@ public class AuthService {
     }
 
 
+    /// Validation for sign in
     private Result<Void> validateSignInRequest(String email, String password) {
         if (email == null || email.trim().isEmpty()) {
             return new Result.Error<>(new FieldRequiredError("Email"));
@@ -54,19 +56,20 @@ public class AuthService {
     }
 
 
+    /// Check Email is correct or not
     private boolean isValidEmail(String email) {
-        String emailRegex = "^[a-z0-9+_.-]+@[a-z0-9.-]+$";
+        String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
         return email.matches(emailRegex);
     }
 
-
-    // Authentication Methods
+    /// Signup Service
     public Result<AuthResponse> signUp(String firstName, String lastName, String email, String password) {
         try {
             Result<Void> validationResult = validateSignUpRequest(firstName, lastName, email, password);
             if (validationResult.isError()) {
                 return new Result.Error<>(validationResult.getErrorOrNull());
             }
+
             User user = new User();
             user.setFirstName(firstName);
             user.setLastName(lastName);
@@ -93,12 +96,14 @@ public class AuthService {
     }
 
 
+    /// Sign-In Service
     public Result<AuthResponse> signIn(String email, String password) {
         try {
             Result<Void> validationResult = validateSignInRequest(email, password);
             if (validationResult.isError()) {
                 return new Result.Error<>(validationResult.getErrorOrNull());
             }
+
             User user = userRepository.findByEmail(email).orElse(null);
 
             if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
@@ -109,6 +114,7 @@ public class AuthService {
             String refreshToken = jwtUtil.generateRefreshToken(user.getId());
 
             user.setRefreshToken(refreshToken);
+            user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
 
             user.setPassword(null);
@@ -121,39 +127,38 @@ public class AuthService {
     }
 
 
-    public Result<String> refreshToken(Long userId, String refreshToken) {
+    /// Refresh Token Service
+    public Result<String> refreshToken(String refreshToken) {
         try {
             if (refreshToken == null || refreshToken.isEmpty()) {
                 return new Result.Error<>(new MissingHeaderError("Refresh Token"));
             }
-            if (jwtUtil.isTokenExpired(refreshToken)) {
-                return new Result.Error<>(new TokenExpiredError());
-            }
 
-            Long tokenUserId;
-            try {
-                tokenUserId = jwtUtil.extractUserId(refreshToken);
-            } catch (Exception e) {
+            if (!jwtUtil.isValidRefreshToken(refreshToken)) {
                 return new Result.Error<>(new InvalidTokenError());
             }
 
-            if (!tokenUserId.equals(userId)) {
-                return new Result.Error<>(new ForbiddenError("Token does not belong to provided user"));
-            }
+            Long userId = jwtUtil.extractUserId(refreshToken);
 
             User user = userRepository.findById(userId).orElse(null);
-            if (user == null || user.getRefreshToken() == null || !refreshToken.equals(user.getRefreshToken())) {
+            if (user == null) {
+                return new Result.Error<>(new NotFoundError("User not found"));
+            }
+
+            if (user.getRefreshToken() == null || !refreshToken.equals(user.getRefreshToken())) {
                 return new Result.Error<>(new RefreshTokenMismatchError());
             }
 
             String newAccessToken = jwtUtil.generateAccessToken(userId);
             return new Result.Success<>(newAccessToken);
+
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
         }
     }
 
 
+    /// Logout Service
     public Result<Void> logout(Long userId) {
         try {
             User user = userRepository.findById(userId).orElse(null);
@@ -164,8 +169,11 @@ public class AuthService {
             if (user.getRefreshToken() == null) {
                 return new Result.Error<>(new BadRequestError("User already logged out"));
             }
+
             user.setRefreshToken(null);
+            user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
+
             return new Result.Success<>(null);
         } catch (Exception e) {
             return new Result.Error<>(new InternalServerError(e.getMessage()));
