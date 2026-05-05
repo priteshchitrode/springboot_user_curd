@@ -19,13 +19,13 @@ spec:
             - containerPort: 8080
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://mysql:3306/springboot_crud
+              value: jdbc:postgresql://postgres:5432/springboot_crud_47yg
             - name: SPRING_DATASOURCE_USERNAME
-              value: root
+              value: springboot_crud_47yg_user
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "1234567890"
+              value: 6xCLZOohG4ji6IHyKD5xXlxpxE1f3Ciq
             - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
-              value: com.mysql.cj.jdbc.Driver
+              value: org.postgresql.Driver
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: SPRING_JPA_SHOW_SQL
