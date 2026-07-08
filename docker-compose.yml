@@ -1,6 +1,6 @@
 services:
   app:
-    image: priteshchitrode/springboot-crud
+    image: priteshchitrode/springboot_user_curd
     container_name: springboot-app
     ports:
       - "8080:9192"

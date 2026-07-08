@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-user-curd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-user-curd
+  template:
+    metadata:
+      labels:
+        app: springboot-user-curd
+    spec:
+      containers:
+        - name: springboot-user-curd
+          image: priteshchitrode/springboot_user_curd:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/springboot_crud_47yg
+            - name: SPRING_DATASOURCE_USERNAME
+              value: springboot_crud_47yg_user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "6xCLZOohG4ji6IHyKD5xXlxpxE1f3Ciq"
+            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+              value: org.postgresql.Driver
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_SHOW_SQL
+              value: "true"
+            - name: SPRING_MAIL_PASSWORD
+              value: "ootw bxoq ygwv quvf"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-user-curd-service
+spec:
+  type: NodePort
+  selector:
+    app: springboot-user-curd
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080

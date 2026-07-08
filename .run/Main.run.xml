@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Main" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="springboot-user-crud" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.priteshchittrode.user_crud.SpringBootCrud" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -11,7 +11,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    // Validation Methods
+    /// Validation User Id Methods
     private Result<Long> validateUserId(String idString) {
         try {
             Long userId = Long.parseLong(idString);
@@ -25,6 +25,7 @@ public class UserService {
     }
 
 
+    /// Validate User Exit or Not  Methods
     private Result<User> validateUserExists(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -42,6 +43,7 @@ public class UserService {
     }
 
 
+    /// Validate Update Methods
     private Result<Void> validateUpdateRequest(User updatedUser) {
         if (updatedUser == null) {
             return new Result.Error<>(new BadRequestError("User data is required"));
@@ -53,7 +55,7 @@ public class UserService {
     }
 
 
-    // User Operations
+    /// Get User Profile Service
     public Result<User> getProfile(String idString) {
         try {
             // Validate ID format
@@ -79,7 +81,7 @@ public class UserService {
     }
 
 
-    // Update Profile
+    /// Update User Profile Service
     public Result<User> updateProfile(User updatedUser) {
         try {
             // Validate request
@@ -127,7 +129,7 @@ public class UserService {
     }
 
 
-    // Get All Users
+    /// Get All User Service
     public Result<List<User>> getAllUsers() {
         try {
             List<User> users = userRepository.findAll();
@@ -144,7 +146,7 @@ public class UserService {
     }
 
 
-    // Delete User
+    /// Delete User Profile Service
     public Result<Void> deleteUser(Long userId) {
         try {
             // Check if user exists
@@ -162,7 +164,7 @@ public class UserService {
     }
 
 
-    // Get User by Email
+    /// Get User By Email Service
     public Result<User> getUserByEmail(String email) {
         try {
             if (email == null || email.trim().isEmpty()) {

@@ -21,17 +21,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                // ❌ Disable default security stuff
+                // Disable default security stuff
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
 
-                // ✅ Stateless JWT-based auth
+                // Stateless JWT-based auth
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
-                // ✅ Public & protected APIs
+                // Public & protected APIs
                 .authorizeRequests()
                 .antMatchers(
                         "/api/auth/sign-up",
@@ -40,11 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .anyRequest().authenticated();
 
-        // ✅ JWT filter
+        // JWT filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    // ✅ Password encoder
+    //  Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
