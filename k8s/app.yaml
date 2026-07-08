@@ -23,13 +23,15 @@ spec:
             - name: SPRING_DATASOURCE_USERNAME
               value: springboot_crud_47yg_user
             - name: SPRING_DATASOURCE_PASSWORD
-              value: 6xCLZOohG4ji6IHyKD5xXlxpxE1f3Ciq
+              value: "6xCLZOohG4ji6IHyKD5xXlxpxE1f3Ciq"
             - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
               value: org.postgresql.Driver
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: SPRING_JPA_SHOW_SQL
               value: "true"
+            - name: SPRING_MAIL_PASSWORD
+              value: "ootw bxoq ygwv quvf"
 
 ---
 apiVersion: v1
